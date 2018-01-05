@@ -1,0 +1,169 @@
+module netsim_tool {
+
+  namespace "http://nil.com/netsim_tool";
+  prefix netsim_tool;
+
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+  
+  description "A library of actions for adding netsim devices";
+  
+	  container netsim {
+			container config {
+				tailf:info "Netsim configuration";
+				leaf netsim-dir {
+					tailf:info "Absolute path to the netsim directory";
+					type string;
+					default "/netsim-lab";
+				}
+				
+				leaf start {
+					tailf:info "Start new devices by default";
+					type boolean;
+					default false;
+				}			
+			}
+			
+			tailf:action create-network {
+				tailf:info "Create new Netsim network";
+				tailf:actionpoint netsim-tool;
+				input {
+					leaf ned-id {
+						type union {
+							type enumeration {
+								enum "juniper-junos";
+								enum "cisco-ios";
+								enum "cisco-iosxr";
+							}
+							type string;
+						}
+					}
+					leaf number {
+						tailf:info "Number of devices";
+						type uint8;
+					}
+					leaf prefix {
+						tailf:info "Prefix for devices";
+						type string;
+					}
+				}
+				output {
+					leaf result {
+						type boolean;
+					}
+					
+					leaf info {
+						type string;
+					}	
+				}
+			}
+			
+			tailf:action delete-network {
+				tailf:info "Delete currently configured Netsim network";
+				tailf:actionpoint netsim-tool;
+				output {
+					leaf result {
+						type boolean;
+					}
+					
+					leaf info {
+						type string;
+					}
+					
+				}
+			}
+			
+			tailf:action add-device {
+				tailf:info "Create new Netsim device(s) and load it into cdb";
+				tailf:actionpoint netsim-tool;
+				input {
+					leaf ned-id {
+						type union {
+							type enumeration {
+								enum "juniper-junos";
+								enum "cisco-ios";
+								enum "cisco-iosxr";
+							}
+							type string;
+						}
+					}
+				
+					leaf-list device-name {
+						type string;
+					}
+				}
+				output {
+					leaf result {
+						type boolean;
+					}
+				
+					leaf info {
+						type string;
+					}
+				}
+			}
+			
+			tailf:action start {
+				tailf:info "Start Netsim device(s)";
+				tailf:actionpoint netsim-tool;
+				input {
+					leaf-list device-name {
+						type leafref { path "/ncs:devices/ncs:device/ncs:name"; } 
+					}
+				}
+				output {
+					leaf result {
+						type boolean;
+					}
+				
+					leaf info {
+						type string;
+					}
+				}
+			}
+			
+			tailf:action stop {
+				tailf:info "Stop Netsim device(s)";
+				tailf:actionpoint netsim-tool;
+				input {
+					leaf-list device-name {
+						type leafref { path "/ncs:devices/ncs:device/ncs:name"; } 
+					}
+				}
+				output {
+					leaf result {
+						type boolean;
+					}
+				
+					leaf info {
+						type string;
+					}
+				}
+			}
+
+			tailf:action is-alive {
+				tailf:info "Check if device is running";
+				tailf:actionpoint netsim-tool;
+				input {
+					leaf-list device-name {
+						type leafref { path "/ncs:devices/ncs:device/ncs:name"; } 
+					}
+				}
+				output {
+					leaf result {
+						type boolean;
+					}
+				
+					leaf info {
+						type string;
+					}
+				}
+			}
+		
+	  }
+
+}
