@@ -15,6 +15,13 @@ class NetsimShell(object):
         
         return out, err
 
+    def create_device(self, name):
+        command = "ncs-netsim --dir {} create-device {} {}".format(self.netsim_dir, self.ned_id, name)
+        p = Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        out, err = p.communicate()
+        
+        return out, err
+
     def delete_network(self):
         command = "ncs-netsim --dir {} delete-network".format(self.netsim_dir)
         p = Popen(command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE)

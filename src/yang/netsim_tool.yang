@@ -61,6 +61,36 @@ module netsim_tool {
 					}	
 				}
 			}
+			tailf:action create-device {
+				tailf:info "Create new Netsim network with one device";
+				tailf:actionpoint netsim-tool;
+				input {
+					leaf ned-id {
+						type union {
+							type enumeration {
+								enum "juniper-junos";
+								enum "cisco-ios";
+								enum "cisco-iosxr";
+							}
+							type string;
+						}
+					}
+					leaf device-name {
+						tailf:info "Device name";
+						type string;
+					}
+				}
+				output {
+					leaf result {
+						type boolean;
+					}
+					
+					leaf info {
+						type string;
+					}	
+				}
+			}
+
 			
 			tailf:action delete-network {
 				tailf:info "Delete currently configured Netsim network";
@@ -78,7 +108,7 @@ module netsim_tool {
 			}
 			
 			tailf:action add-device {
-				tailf:info "Create new Netsim device(s) and load it into cdb";
+				tailf:info "Add device(s) to network";
 				tailf:actionpoint netsim-tool;
 				input {
 					leaf ned-id {
@@ -146,7 +176,7 @@ module netsim_tool {
 			}
 
 			tailf:action is-alive {
-				tailf:info "Check if device is running";
+				tailf:info "Check device(s) aliveness";
 				tailf:actionpoint netsim-tool;
 				input {
 					leaf-list device-name {

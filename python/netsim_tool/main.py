@@ -33,6 +33,12 @@ class NetsimTool(Action):
             prefix = '' if input.prefix is None else input.prefix
             state = self.create_network_action(netsim, number, prefix)
             self.action_output(output, state['success'], state['error'])
+
+        if name == 'create-device':
+            state = self.create_device_action(netsim, devices)
+            # Sync from
+            r.devices.device[devices].sync_from.request()
+            self.action_output(output, state['success'], state['error'])
         
         if name == 'delete-network':
             state = self.delete_network_action(netsim)
@@ -91,16 +97,40 @@ class NetsimTool(Action):
             # Create the network
             success, error = netsim.create_network(number, prefix)
             if error: break
+            # Start netsim device if configured
+            # if netsim.start:
+            #     s, error = netsim.start_device(device)
+            # if not error: success = 'Network successfully created'
             # Init netsim device configuration
             s, error = netsim.init_config('')
             if error: break
             # Load init configuration to cdb
             s, error = netsim.load_config()
             if error: break
+
+            break
+
+        return {'success': success, 'error': error}
+
+    def create_device_action(self, netsim, device):
+        self.log.info('Creating new netsim network with device ', device)
+        error = False
+        while not error:
+            # Create the network
+            success, error = netsim.create_device(device)
+            if error: break
             # Start netsim device if configured
             if netsim.start:
-                s, error = netsim.start_device()
+                s, error = netsim.start_device(device)
             # if not error: success = 'Network successfully created'
+            # Init netsim device configuration
+            s, error = netsim.init_config(device)
+            if error: break
+            # Load init configuration to cdb
+            s, error = netsim.load_config()
+            if error: break
+            
+
             break
 
         return {'success': success, 'error': error}
@@ -118,6 +148,12 @@ class NetsimTool(Action):
             success, error = netsim.add_device(device)
             if error: break
             self.log.info('Device {} added'.format(device))
+            # Start netsim device
+            if netsim.start:
+                s, error = netsim.start_device(device)
+                if not error: 
+                    self.log.info('Device {} started'.format(device))
+                # success = "Device {} added successfully".format(device)
             # Init netsim device configuration
             s, error = netsim.init_config(device)
             if error: break
@@ -126,12 +162,9 @@ class NetsimTool(Action):
             s, error = netsim.load_config()
             if error: break
             self.log.info('Device {} loaded into cdb'.format(device))
-            # Start netsim device
-            if netsim.start:
-                s, error = netsim.start_device(device)
-                if not error: 
-                    self.log.info('Device {} started'.format(device))
-            # success = "Device {} added successfully".format(device)
+            # Sync from
+
+
             break
 
         return {'success': success, 'error': error}
