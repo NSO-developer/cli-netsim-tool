@@ -37,7 +37,7 @@ class NetsimTool(Action):
         if name == 'create-device':
             state = self.create_device_action(netsim, devices)
             # Sync from
-            r.devices.device[devices].sync_from.request()
+            # r.devices.device[devices].sync_from.request()
             self.action_output(output, state['success'], state['error'])
         
         if name == 'delete-network':
@@ -87,6 +87,14 @@ class NetsimTool(Action):
                 state = self.alive_action(netsim, '')
                 success = state['success']
                 error = state['error']
+
+            self.action_output(output, success, error)
+        
+        elif name == 'update-network':
+            ncs_run = input.ncs_run
+            state = self.update_action(netsim, ncs_run)
+            success = state['success']
+            error = state['error']
 
             self.action_output(output, success, error)
 
@@ -185,6 +193,14 @@ class NetsimTool(Action):
         self.log.info('Checking if {} is alive'.format(device))
         success, error = netsim.device_alive(device)
 
+        return {'success': success, 'error': error}
+
+    def update_action(self, netsim, ncs_run):
+        self.log.info('Updating netsim')
+        success, error = netsim.update_netsim(ncs_run)
+        if not error:
+            self.log.info('No errors while updating ')
+            success = "Netsim updated!"
         return {'success': success, 'error': error}
 
     def action_output(self, output, success, error):

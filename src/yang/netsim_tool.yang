@@ -27,6 +27,8 @@ module netsim_tool {
 					default false;
 				}			
 			}
+
+			
 			
 			tailf:action create-network {
 				tailf:info "Create new Netsim network";
@@ -191,6 +193,27 @@ module netsim_tool {
 					leaf info {
 						type string;
 					}
+				}
+			}
+
+			tailf:action update-network {
+				tailf:info "Update netsim fxs when NSO was updated";
+				tailf:actionpoint netsim-tool;
+				input {
+					leaf ncs-run {
+						tailf:info "Absolute path to current running directory";
+						type string;
+					}
+				}
+				output {
+					leaf result {
+						type boolean;
+					}
+					
+					leaf info {
+						type string;
+					}
+					
 				}
 			}
 		
