@@ -39,23 +39,25 @@ class NetsimShell(object):
         return out, err
         
     def load_config(self):
-        self.execute("ncs_load -l -m")
-
+        command = "ncs_load -l -m"
+        p = Popen(command.split(), cwd=self.netsim_dir, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        out, err = p.communicate(self.device_config)
+        
         return out, err
 
     def start_device(self, name):
-        self.execute("ncs-netsim --dir {} start {}".format(self.netsim_dir, name))
+        out, err = self.execute("ncs-netsim --dir {} start {}".format(self.netsim_dir, name))
     
         return out, err
         
 
     def stop_device(self, name):
-        self.execute("ncs-netsim --dir {} stop {}".format(self.netsim_dir, name))
+        out, err = self.execute("ncs-netsim --dir {} stop {}".format(self.netsim_dir, name))
         
         return out, err
     
     def device_alive(self, name):
-        self.execute("ncs-netsim --dir {} is-alive {}".format(self.netsim_dir, name))
+        out, err = self.execute("ncs-netsim --dir {} is-alive {}".format(self.netsim_dir, name))
         
         return out, err
 
