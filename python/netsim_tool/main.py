@@ -4,6 +4,8 @@ import _ncs
 
 from ncs.application import Service
 from ncs.dp import Action
+import collections
+import os
 
 from shell_commands import NetsimShell
 
@@ -19,13 +21,22 @@ class NetsimTool(Action):
         ned_id = input.ned_id if hasattr(input, 'ned_id') else None
         default_start = r.netsim.config.start
         netsim_dir = r.netsim.config.netsim_dir
+        # default ports
+        Ports = collections.namedtuple('Ports', 'IPC_PORT NETCONF_SSH_PORT NETCONF_TCP_PORT SNMP_PORT CLI_SSH_PORT' )
+        if r.netsim.config.IPC_PORT is not None: Ports.IPC_PORT = r.netsim.config.IPC_PORT
+        if r.netsim.config.CLI_SSH_PORT is not None: Ports.NETCONF_SSH_PORT = r.netsim.config.NETCONF_SSH_PORT
+        if r.netsim.config.NETCONF_TCP_PORT is not None: Ports.NETCONF_TCP_PORT = r.netsim.config.NETCONF_TCP_PORT
+        if r.netsim.config.SNMP_PORT is not None: Ports.SNMP_PORT = r.netsim.config.SNMP_PORT 
+        if r.netsim.config.CLI_SSH_PORT is not None: Ports.CLI_SSH_PORT = r.netsim.config.CLI_SSH_PORT 
+
+
         success = ''
         error = ''
         
         if not netsim_dir: 
             self.action_output(output, {'error' : 'Netsim directory is not configured'})
             return
-
+        
         netsim = NetsimShell(ned_id, netsim_dir, default_start)
 
         if name == 'create-network':
@@ -137,8 +148,6 @@ class NetsimTool(Action):
             # Load init configuration to cdb
             s, error = netsim.load_config()
             if error: break
-            
-
             break
 
         return {'success': success, 'error': error}
@@ -171,8 +180,6 @@ class NetsimTool(Action):
             if error: break
             self.log.info('Device {} loaded into cdb'.format(device))
             # Sync from
-
-
             break
 
         return {'success': success, 'error': error}
@@ -197,6 +204,7 @@ class NetsimTool(Action):
 
     def update_action(self, netsim, ncs_run):
         self.log.info('Updating netsim')
+        
         success, error = netsim.update_netsim(ncs_run)
         if not error:
             self.log.info('No errors while updating ')
@@ -210,6 +218,10 @@ class NetsimTool(Action):
         else:
             output.result = True
             output.info = success
+
+    def setPorts(self, Ports):
+        for name, value in Ports._asdict().iteritems():
+            self.log.info('name: {}, value {}'.format(name,value))
     
     def setUp(self):
         m = ncs.maapi.Maapi()

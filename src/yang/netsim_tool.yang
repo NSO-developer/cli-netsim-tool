@@ -20,6 +20,26 @@ module netsim_tool {
 					type string;
 					default "/netsim-lab";
 				}
+
+				leaf IPC_PORT {
+					type uint32;
+				}
+
+				leaf NETCONF_SSH_PORT {
+					type uint32;
+				}
+
+				leaf NETCONF_TCP_PORT {
+					type uint32;
+				}
+
+				leaf SNMP_PORT {
+					type uint32;
+				}
+
+				leaf CLI_SSH_PORT {
+					type uint32;
+				}
 				
 				leaf start {
 					tailf:info "Start new devices by default";

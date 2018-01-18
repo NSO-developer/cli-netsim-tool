@@ -62,26 +62,28 @@ class NetsimShell(object):
         return out, err
 
     def update_netsim(self, ncs_dir):
-        # Find out all devices
-        # return [device.split()[5][4:] for device in self.list_netsim()[0].splitlines() if "dir=/" in device]
+        # Find all devices
         device_paths = [device.split()[5][4:] for device in self.list_netsim()[0].splitlines() if "dir=/" in device]
 
         for path in device_paths:
-            fxs = [ file for file in os.listdir(path) if file.endswith('.fxs')]
-            for file in fxs:
+            fxs_files = [ file for file in os.listdir(path) if file.endswith('.fxs')]
+            for file in fxs_files:
                 # wnb cache
                 # if [ path for path in self.cache if file in path ]:
-                out, err = self.execute("find {} -name {}".format(ncs_dir, file))
+                out, err = self.execute("find -L {} -name {}".format(ncs_dir, file))
                 if out:
-                    out, err = self.execute("cp {} {}".format(out, path))
+                    netsim_fxs = [x for x in out.splitlines() if "/netsim/" + file in x][0]
+                    if netsim_fxs:
+                        out, err = self.execute("cp {} {}".format(netsim_fxs, path))
+                    else:
+                        err = "Couldn't find {} in your running directory\nCheck if you have the appropriate NEDs.".format(file)
                 if err: break
             if err: break
 
         return out, err
 
     def list_netsim(self, filter=None):
-        out, err = self.execute("ncs-netsim --dir {} list".format(self.netsim_dir))
-        
+        out, err = self.execute("ncs-netsim --dir {} list".format(self.netsim_dir))    
         return out, err
 
     def execute(self, command):
