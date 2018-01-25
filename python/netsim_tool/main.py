@@ -16,19 +16,15 @@ class NetsimTool(Action):
         self.log.info('action name: ', name)
         # setting up Maapi
         r = self.setUp()
+        # Setting the default ports
+        self.setPorts(r)
 
         devices = input.device_name if hasattr(input, 'device_name') and input.device_name else ''
         ned_id = input.ned_id if hasattr(input, 'ned_id') else None
-        default_start = r.netsim.config.start
+        # default_start = r.netsim.config.start
         netsim_dir = r.netsim.config.netsim_dir
-        # default ports
         Ports = collections.namedtuple('Ports', 'IPC_PORT NETCONF_SSH_PORT NETCONF_TCP_PORT SNMP_PORT CLI_SSH_PORT' )
-        if r.netsim.config.IPC_PORT is not None: Ports.IPC_PORT = r.netsim.config.IPC_PORT
-        if r.netsim.config.CLI_SSH_PORT is not None: Ports.NETCONF_SSH_PORT = r.netsim.config.NETCONF_SSH_PORT
-        if r.netsim.config.NETCONF_TCP_PORT is not None: Ports.NETCONF_TCP_PORT = r.netsim.config.NETCONF_TCP_PORT
-        if r.netsim.config.SNMP_PORT is not None: Ports.SNMP_PORT = r.netsim.config.SNMP_PORT 
-        if r.netsim.config.CLI_SSH_PORT is not None: Ports.CLI_SSH_PORT = r.netsim.config.CLI_SSH_PORT 
-
+        
 
         success = ''
         error = ''
@@ -37,7 +33,7 @@ class NetsimTool(Action):
             self.action_output(output, {'error' : 'Netsim directory is not configured'})
             return
         
-        netsim = NetsimShell(ned_id, netsim_dir, default_start)
+        netsim = NetsimShell(ned_id, netsim_dir)
 
         if name == 'create-network':
             number = input.number
@@ -108,6 +104,8 @@ class NetsimTool(Action):
             error = state['error']
 
             self.action_output(output, success, error)
+
+
 
     def create_network_action(self, netsim, number, prefix):
         self.log.info('Creating new netsim network')
@@ -219,9 +217,21 @@ class NetsimTool(Action):
             output.result = True
             output.info = success
 
-    def setPorts(self, Ports):
-        for name, value in Ports._asdict().iteritems():
-            self.log.info('name: {}, value {}'.format(name,value))
+    def setPorts(self, r):
+        self.log.info('Setting up the ports ')
+        IPC_PORT = str(r.netsim.config.IPC_PORT)
+        NETCONF_SSH_PORT = str(r.netsim.config.NETCONF_SSH_PORT)
+        NETCONF_TCP_PORT = str(r.netsim.config.NETCONF_SSH_PORT)
+        SNMP_PORT = str(r.netsim.config.SNMP_PORT)
+        CLI_SSH_PORT = str(r.netsim.config.CLI_SSH_PORT)
+
+        os.environ["IPC_PORT"] = IPC_PORT
+        os.environ["NETCONF_SSH_PORT"] = NETCONF_SSH_PORT
+        os.environ["NETCONF_TCP_PORT"] = NETCONF_TCP_PORT        
+        os.environ["SNMP_PORT"] = SNMP_PORT
+        os.environ["CLI_SSH_PORT"] = CLI_SSH_PORT
+        
+        
     
     def setUp(self):
         m = ncs.maapi.Maapi()

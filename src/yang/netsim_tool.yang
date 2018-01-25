@@ -22,34 +22,43 @@ module netsim_tool {
 				}
 
 				leaf IPC_PORT {
+					tailf:info "Default 5010";
 					type uint32;
+					default 5010;
 				}
 
 				leaf NETCONF_SSH_PORT {
+					tailf:info "12022";
 					type uint32;
+					default 12022;
 				}
 
 				leaf NETCONF_TCP_PORT {
+					tailf:info "13022";
 					type uint32;
+					default 13022;
+
 				}
 
 				leaf SNMP_PORT {
+					tailf:info "11022";
 					type uint32;
+					default 11022;
 				}
 
 				leaf CLI_SSH_PORT {
+					tailf:info "10022";
 					type uint32;
+					default 10022;
 				}
 				
-				leaf start {
-					tailf:info "Start new devices by default";
-					type boolean;
-					default false;
-				}			
+				// leaf start {
+				// 	tailf:info "Start new devices by default";
+				// 	type boolean;
+				// 	default false;
+				// }			
 			}
 
-			
-			
 			tailf:action create-network {
 				tailf:info "Create new Netsim network";
 				tailf:actionpoint netsim-tool;

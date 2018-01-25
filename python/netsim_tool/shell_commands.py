@@ -3,10 +3,9 @@ import os
 
 """Methods executing shell commands"""
 class NetsimShell(object):
-    def __init__(self, ned_id, netsim_dir, start, device_config = None):
+    def __init__(self, ned_id, netsim_dir, device_config = None):
         self.ned_id = ned_id
         self.netsim_dir = netsim_dir
-        self.start = start
         self.device_config = device_config
         self.cache = []
 
