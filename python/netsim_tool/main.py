@@ -15,9 +15,9 @@ class NetsimTool(Action):
     def cb_action(self, uinfo, name, kp, input, output):
         self.log.info('action name: ', name)
 
-        r = self.setup_maapi()
+        r = setup_maapi()
         # Setting the default ports
-        self.set_ports(r)
+        set_ports(r)
 
         devices = input.device_name if hasattr(input, 'device_name') and input.device_name else ''
         ned_id = input.ned_id if hasattr(input, 'ned_id') else None
@@ -228,7 +228,7 @@ def action_output(output, response):
         output.info = success
 
 
-def set_ports(self, r):
+def set_ports(r):
     self.log.info('Setting up the ports ')
     ipc_port = str(r.netsim.config.IPC_PORT)
     netconf_ssh_port = str(r.netsim.config.NETCONF_SSH_PORT)
@@ -243,7 +243,7 @@ def set_ports(self, r):
     os.environ["CLI_SSH_PORT"] = cli_ssh_port
 
 
-def setup_maapi(self):
+def setup_maapi():
     m = ncs.maapi.Maapi()
     m.start_user_session('admin', 'system', [])
     t = m.start_trans(ncs.RUNNING, ncs.READ_WRITE)
