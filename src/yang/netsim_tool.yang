@@ -225,13 +225,43 @@ module netsim_tool {
 				}
 			}
 
+			tailf:action list {
+				tailf:info "List netsim devices";
+				tailf:actionpoint netsim-tool;
+				output {
+					leaf result {
+						type boolean;
+					}
+
+					leaf info {
+						type string;
+					}
+				}
+			}
+
+			tailf:action load {
+				tailf:info "Load devices from the 'netsim-dir'";
+				tailf:actionpoint netsim-tool;
+				output {
+					leaf result {
+						type boolean;
+					}
+
+					leaf info {
+						type string;
+					}
+				}
+			}
+
 			tailf:action update-network {
 				tailf:info "Update netsim fxs when NSO was updated";
 				tailf:actionpoint netsim-tool;
 				input {
+				    //TODO: automatically find current ncs-run
 					leaf ncs-run {
 						tailf:info "Absolute path to current running directory";
 						type string;
+						mandatory true;
 					}
 				}
 				output {

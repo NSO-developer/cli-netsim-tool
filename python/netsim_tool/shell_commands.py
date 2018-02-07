@@ -6,35 +6,35 @@ import os
 
 
 class NetsimShell(object):
-    def __init__(self, ned_id, netsim_dir=None, device_config=None):
+    def __init__(self, ned_id, netsim_dir, device_config=None):
         self.ned_id = ned_id
-        # self.netsim_dir = netsim_dir
+        self.netsim_dir = netsim_dir
         self.device_config = device_config
         # self.cache = []
-        self.result = namedtuple('success', 'error')
+        self.result = namedtuple('Result', 'success, error')
 
     def create_network(self, number, prefix):
         response = self.execute(
-            "ncs-netsim create-network {} {} {}".format(self.ned_id, number, prefix))
+            "ncs-netsim --dir {} create-network {} {} {}".format(self.netsim_dir, self.ned_id, number, prefix))
         return response
 
     def create_device(self, name):
-        response = self.execute("ncs-netsim create-device {} {}".format(self.ned_id, name))
+        response = self.execute("ncs-netsim --dir {} create-device {} {}".format(self.netsim_dir, self.ned_id, name))
         return response
 
     def delete_network(self):
-        response = self.execute("ncs-netsim delete-network")
+        response = self.execute("ncs-netsim --dir {} delete-network".format(self.netsim_dir))
         return response
 
     def add_device(self, name):
-        response = self.execute("ncs-netsim add-device {} {}".format(self.ned_id, name))
+        response = self.execute("ncs-netsim --dir {} add-device {} {}".format(self.netsim_dir, self.ned_id, name))
         return response
 
     def init_config(self, name):
-        reponse = self.execute("ncs-netsim ncs-xml-init {}".format(name))
+        response = self.execute("ncs-netsim --dir {} ncs-xml-init {}".format(self.netsim_dir, name))
         # Save config to the object
         if not response.error:
-            self.device_config = reponse.success
+            self.device_config = response.success
         return response
 
     def load_config(self):
@@ -42,15 +42,19 @@ class NetsimShell(object):
         return response
 
     def start_device(self, name):
-        response = self.execute("ncs-netsim start {}".format(name))
+        response = self.execute("ncs-netsim --dir {} start {}".format(self.netsim_dir, name))
         return response
 
     def stop_device(self, name):
-        response = self.execute("ncs-netsim stop {}".format(name))
+        response = self.execute("ncs-netsim --dir {} stop {}".format(self.netsim_dir, name))
         return response
 
     def device_alive(self, name):
-        response = self.execute("ncs-netsim is-alive {}".format(name))
+        response = self.execute("ncs-netsim --dir {} is-alive {}".format(self.netsim_dir, name))
+        return response
+
+    def list_netsim(self, filter=None):
+        response = self.execute("ncs-netsim --dir {} list".format(self.netsim_dir))
         return response
 
     def update_netsim(self, ncs_dir):
@@ -65,7 +69,7 @@ class NetsimShell(object):
                 # if [ path for path in self.cache if file in path ]:
                 response = self.execute("find -L {} -name {}".format(ncs_dir, file))
                 if response.success:
-                    netsim_fxs = [x for x in out.splitlines() if "/netsim/" + file in x][0]
+                    netsim_fxs = [x for x in response.success.splitlines() if "/netsim/" + file in x][0]
                     if netsim_fxs:
                         response = self.execute("cp {} {}".format(netsim_fxs, path))
                     else:
@@ -79,10 +83,6 @@ class NetsimShell(object):
         if not response.error:
             response = self.result('Netsim updated!', None)
 
-        return response
-
-    def list_netsim(self, filter=None):
-        response = self.execute("ncs-netsim list".format(self.netsim_dir))
         return response
 
     def execute(self, command, stdin=None):
