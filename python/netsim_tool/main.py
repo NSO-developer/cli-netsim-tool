@@ -210,8 +210,6 @@ class NetsimTool(Action):
 
     def load_action(self, netsim):
         self.log.info('Loading netsim devices')
-
-        response = netsim.init_config('')
         response = netsim.load_config()
 
         return response
