@@ -21,7 +21,7 @@ Apart from this README, please refer to the python code and associated YANG file
 ## Dependencies
 * NSO 4.3.6+ Local installation (Probably works on older versions aswell but not tested)
 * Python 2.7+ or 3+
-
+* Python Popen module
 ## Build instructions
 make -C <running dir>/packages/netsim-tool clean all
 
