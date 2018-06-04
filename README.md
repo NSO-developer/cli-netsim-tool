@@ -1,29 +1,29 @@
 ## netsim-tool
-A package wrapping netsim commands. Available **only for NSO local-install**! Tested on Ubuntu 16.04 OS.
+A package wrapping netsim commands. Available **only for NSO local-install**. Tested on Ubuntu 16.04.
 
 ## Purpose
 netsim-tool enables you to easily add new netsim networks, multiple devices to existing networks and most of other commands
 otherwise available with _ncs-netsim_ command. List of available commands below.
-    ⋅⋅* create-network
-    ⋅⋅* create-device
-    ⋅⋅* delete-network
-    ⋅⋅* add-device
-    ⋅⋅* start
-    ⋅⋅* stop
-    ⋅⋅* is-alive
-    ⋅⋅* list
-    ⋅⋅* load
-    ⋅⋅* update-network
+* create-network
+* create-device
+* delete-network
+* add-device
+* start
+* stop
+* is-alive
+* list
+* load
+* update-network
 
 ## Documentation
-Please refer to the python code and associated YANG file.
+Apart from this README, please refer to the python code and associated YANG file.
 
 ## Dependencies
-    ..* NSO 4.3.6+ Local installation (Probably works on older versions aswell but not tested)
-    ..* Python 2.7+ or 3+
+* NSO 4.3.6+ Local installation (Probably works on older versions aswell but not tested)
+* Python 2.7+ or 3+
 
 ## Build instructions
-make -C <running dir>/packages/netsim_tool clean all
+make -C <running dir>/packages/netsim-tool clean all
 
 ## Usage examples
 ### config
