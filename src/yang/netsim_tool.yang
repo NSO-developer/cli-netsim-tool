@@ -18,8 +18,7 @@ module netsim_tool {
 
    revision 2018-05-06 {
      description
-     "1.0.1
-      See CHANGES.
+     "contact: sspehar@nil.com
      ";
    }
 
