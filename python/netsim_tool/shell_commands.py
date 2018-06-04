@@ -10,8 +10,7 @@ class NetsimShell(object):
         self.ned_id = ned_id
         self.netsim_dir = netsim_dir
         self.device_config = device_config
-        # self.cache = []
-        self.result = namedtuple('Result', 'success, error')
+        self.result = namedtuple('Result', 'success error')
 
     def create_network(self, number, prefix):
         response = self.execute(
@@ -65,8 +64,6 @@ class NetsimShell(object):
         for path in device_paths:
             fxs_files = [file for file in os.listdir(path) if file.endswith('.fxs')]
             for file in fxs_files:
-                # wnb cache
-                # if [ path for path in self.cache if file in path ]:
                 response = self.execute("find -L {} -name {}".format(ncs_dir, file))
                 if response.success:
                     netsim_fxs = [x for x in response.success.splitlines() if "/netsim/" + file in x][0]

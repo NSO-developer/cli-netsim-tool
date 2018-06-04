@@ -14,14 +14,14 @@ class NetsimTool(Action):
         self.log.info('action name: ', name)
         success = ''
         error = ''
-        message = namedtuple('Message', 'success, error')
+        message = namedtuple('Message', 'success error')
         r = setup_maapi()
         set_ports(r)
 
+        # some actions can take device list as an input. I.e. start action
         devices = input.device_name if hasattr(input, 'device_name') and input.device_name else ''
         ned_id = input.ned_id if hasattr(input, 'ned_id') else None
         netsim_dir = r.netsim.config.netsim_dir
-        # default_start = r.netsim.config.start
 
         netsim = NetsimShell(ned_id, netsim_dir)
 
@@ -48,8 +48,8 @@ class NetsimTool(Action):
                 error += result.error
             action_output(output, message(success, error))
 
-        # TODO: output for multiple devices
         elif name == 'start':
+            # list of devices or all
             if devices:
                 for device in devices:
                     result = self.start_device_action(netsim, device)
@@ -63,6 +63,7 @@ class NetsimTool(Action):
             action_output(output, message(success, error))
 
         elif name == 'stop':
+            # list of devices or all
             if devices:
                 for device in devices:
                     result = self.stop_device_action(netsim, device)
@@ -76,6 +77,7 @@ class NetsimTool(Action):
             action_output(output, message(success, error))
 
         elif name == 'is-alive':
+            # list of devices or all
             if devices:
                 for device in devices:
                     state = self.alive_action(netsim, device)
@@ -106,50 +108,58 @@ class NetsimTool(Action):
     # Actions implementation
 
     def create_network_action(self, netsim, number, prefix):
+        """
+         Used for creating netsim network with number of devices and prefix for name
+        """
         self.log.info('Creating new netsim network')
-        error = False
-        while not error:
+        response = None
+        while True:
             # Create the network
             create_response = netsim.create_network(number, prefix)
+            response = create_response
             if create_response.error:
                 break
             # Init netsim device configuration
             init_response = netsim.init_config('')
             if init_response.error:
+                response = init_response
                 break
             # Load init configuration to cdb
             load_response = netsim.load_config()
             if load_response.error:
+                response = load_response
                 break
-
+            # all operations finished
             break
 
-        return create_response
+        return response
 
     def create_device_action(self, netsim, device):
+        """
+        Used for creating a network with one device.
+        """
         self.log.info('Creating new netsim network with device ', device)
-        error = False
-        while not error:
+        response = None
+        while True:
             # Create the network
             create_response = netsim.create_device(device)
-
+            response = create_response
             if create_response.error:
                 break
-            # Start netsim device if configured
-            # if netsim.start:
-            #     response = netsim.start_device(device)
-            # if not error: success = 'Network successfully created'
             # Init netsim device configuration
             init_response = netsim.init_config(device)
             if init_response.error:
+                response = init_response
                 break
             # Load init configuration to cdb
             load_response = netsim.load_config()
             if load_response.error:
+                response = load_response
                 break
+            # all operations finished
             break
 
-        return create_response
+        return response
 
     def delete_network_action(self, netsim):
         self.log.info('Deleting {} netsim network'.format(os.environ["NETSIM_DIR"]))
@@ -158,31 +168,31 @@ class NetsimTool(Action):
         return response
 
     def add_device_action(self, netsim, device):
+        """
+        Adding one or more devices to existing netsim network
+        """
         self.log.info('Adding device {} to the network'.format(device))
-        error = False
-        while not error:
+        response = None
+        while True:
             # Add device to the network
             add_response = netsim.add_device(device)
+            response = add_response
             if add_response.error:
                 break
-            # Start netsim device
-            # if netsim.start:
-            #     response = netsim.start_device(device)
-            #     if not response.error:
-            #         self.log.info('Device {} started'.format(device))
-
             # Init netsim device configuration
             init_response = netsim.init_config(device)
             if init_response.error:
+                response = init_response
                 break
             # Load init configuration to cdb
             load_response = netsim.load_config()
             if load_response.error:
+                response = load_response
                 break
-
+            # all operations finished
             break
 
-        return add_response
+        return response
 
     def start_device_action(self, netsim, device):
         self.log.info('Starting: ', device)
@@ -215,6 +225,9 @@ class NetsimTool(Action):
         return response
 
     def update_action(self, netsim, ncs_run):
+        """
+        Updating netsim devices in current network with new fxs from the NEDs in updated version of NSO.
+        """
         self.log.info('Updating netsim')
         response = netsim.update_netsim(ncs_run)
 
@@ -222,15 +235,21 @@ class NetsimTool(Action):
 
 
 def action_output(output, response):
-    if response.error:
+    if response.success and response.error:
         output.result = False
-        output.info = response.error
-    else:
+        output.info = response.success + '\n' + 'Error:\n' + response.error
+    elif response.success:
         output.result = True
         output.info = response.success
+    else:
+        output.result = False
+        output.info = response.error
 
 
 def set_ports(r):
+    """
+    Users can change default ports on which netsim processes are running
+    """
     ipc_port = str(r.netsim.config.IPC_PORT)
     netconf_ssh_port = str(r.netsim.config.NETCONF_SSH_PORT)
     netconf_tcp_port = str(r.netsim.config.NETCONF_SSH_PORT)
@@ -261,8 +280,4 @@ class Main(ncs.application.Application):
         self.register_action('netsim-tool', NetsimTool)
 
     def teardown(self):
-        # When the application is finished (which would happen if NCS went
-        # down, packages were reloaded or some error occurred) this teardown
-        # method will be called.
-
         self.log.info('Main FINISHED')

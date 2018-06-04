@@ -9,8 +9,37 @@ module netsim_tool {
   import tailf-ncs {
     prefix ncs;
   }
-  
+
   description "A library of actions for adding netsim devices";
+
+   // =========================================================================
+   // REVISION
+   // =========================================================================
+
+   revision 2018-05-06 {
+     description
+     "1.0.1
+      See CHANGES.
+     ";
+   }
+
+   // =========================================================================
+   // TYPEDEF
+   // =========================================================================
+
+   typedef ned-id {
+	type union {
+		type enumeration {
+			enum "juniper-junos";
+			enum "cisco-ios";
+			enum "cisco-iosxr";
+			enum "paloalto-panos_cli";
+		}
+		type string;
+	}
+   }
+  
+  
   
 	  container netsim {
 			container config {
@@ -51,12 +80,7 @@ module netsim_tool {
 					type uint32;
 					default 10022;
 				}
-				
-				// leaf start {
-				// 	tailf:info "Start new devices by default";
-				// 	type boolean;
-				// 	default false;
-				// }			
+							
 			}
 
 			tailf:action create-network {
@@ -64,20 +88,17 @@ module netsim_tool {
 				tailf:actionpoint netsim-tool;
 				input {
 					leaf ned-id {
-						type union {
-							type enumeration {
-								enum "juniper-junos";
-								enum "cisco-ios";
-								enum "cisco-iosxr";
-							}
-							type string;
-						}
+						tailf:info "NED ID";
+						mandatory true;
+						type ned-id;
 					}
 					leaf number {
+						mandatory true;
 						tailf:info "Number of devices";
 						type uint8;
 					}
 					leaf prefix {
+						mandatory true;
 						tailf:info "Prefix for devices";
 						type string;
 					}
@@ -97,17 +118,13 @@ module netsim_tool {
 				tailf:actionpoint netsim-tool;
 				input {
 					leaf ned-id {
-						type union {
-							type enumeration {
-								enum "juniper-junos";
-								enum "cisco-ios";
-								enum "cisco-iosxr";
-							}
-							type string;
-						}
+						tailf:info "NED ID";
+						mandatory true;
+						type ned-id;	
 					}
 					leaf device-name {
 						tailf:info "Device name";
+						mandatory true;
 						type string;
 					}
 				}
@@ -143,14 +160,9 @@ module netsim_tool {
 				tailf:actionpoint netsim-tool;
 				input {
 					leaf ned-id {
-						type union {
-							type enumeration {
-								enum "juniper-junos";
-								enum "cisco-ios";
-								enum "cisco-iosxr";
-							}
-							type string;
-						}
+						tailf:info "NED ID";
+						mandatory true;
+						type ned-id;
 					}
 				
 					leaf-list device-name {
@@ -254,7 +266,7 @@ module netsim_tool {
 			}
 
 			tailf:action update-network {
-				tailf:info "Update netsim fxs when NSO was updated";
+				tailf:info "Update netsim fxs when NSO is updated";
 				tailf:actionpoint netsim-tool;
 				input {
 				    //TODO: automatically find current ncs-run
