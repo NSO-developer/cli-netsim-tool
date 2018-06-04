@@ -1,23 +1,55 @@
-This is a generated Python package, made by:
+## netsim-tool
+A package wrapping netsim commands. Available **only for NSO local-install**! Tested on Ubuntu 16.04 OS.
 
-  ncs-make-package --service-skeleton python \
-                   --component-class main.Main netsim_v1
+## Purpose
+netsim-tool enables you to easily add new netsim networks, multiple devices to existing networks and most of other commands
+otherwise available with _ncs-netsim_ command. List of available commands below.
+    ⋅⋅* create-network
+    ⋅⋅* create-device
+    ⋅⋅* delete-network
+    ⋅⋅* add-device
+    ⋅⋅* start
+    ⋅⋅* stop
+    ⋅⋅* is-alive
+    ⋅⋅* list
+    ⋅⋅* load
+    ⋅⋅* update-network
 
-It contains a dummy YANG model which implements a minimal Service
-and an Action that doesn't really do anything useful. They are
-there just to get you going.
+## Documentation
+Please refer to the python code and associated YANG file.
 
-You will also find two test cases in:
+## Dependencies
+    ..* NSO 4.3.6+ Local installation (Probably works on older versions aswell but not tested)
+    ..* Python 2.7+ or 3+
 
-  test/internal/lux/service/
-  test/internal/lux/action/
+## Build instructions
+make -C <running dir>/packages/netsim_tool clean all
 
-that you can run if you have the 'lux' testing tool.
-Your top Makefile also need to implement some Make targets
-as described in the Makefiles of the test cases.
-You can also just read the corresponding run.lux tests and
-do them manually if you wish.
+## Usage examples
+### config
+User can configure default ports of running netsim processes and netsim-dir, which represents the folder where netsim network and devices are created.
+In this way it's easy to switch between multiple netsim networks. Users should specify absolute path for a directory where they want to create the network.
+default value is _/netsim-lab_.
+```admin@ncs(config)# netsim config netsim-dir /ios-netsim-lab```
+### create-device
+New networks can be created by using _create-network_ or _create-device_ actions. Both will create new network and load devices to NSO cdb.
+```admin@ncs# netsim create-device device-name R1 ned-id cisco-ios```
+### add-device
+Users can add one or multiple devices to existing networks. This action also creates devices and loads them to NSO cdb.
+```netsim add-device device-name [ R2 R2 R3 ] ned-id cisco-ios```
+### start
+Netsim devices can be started or stopped using this package. If user provides list of devices then only those will be started. If he skips the list all of netsim devices will be started.
+```admin@ncs(config)# netsim start device-name [ R1 R3 ]```
+### load
+Using netsim-tool load users can load existing netsim networks into new NSO running instance. Issuing this command will load devices in netsim network specified in _config->netsim-dir_.
+```admin@ncs(config)# netsim load```
+### update-network
+When changing NSO versions, existing netsim networks might stop working. With update-network action users can change schema files (.fxs)
+in the network with the ones from current NSO, which enables netsim devices to work with current version.
+```netsim update-network ncs-run /home/cisco/ncs-run```
 
-The 'lux' test tool can be obtained from:
 
-  https://github.com/hawk/lux.git
+
+
+
+
