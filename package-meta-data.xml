@@ -1,5 +1,5 @@
 <ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
-  <name>netsim_tool</name>
+  <name>cli-netsim-tool</name>
   <package-version>1.0</package-version>
   <description>A library of actions for adding netsim devices</description>
   <ncs-min-version>4.3.6</ncs-min-version>

@@ -23,7 +23,7 @@ Apart from this README, please refer to the python code and associated YANG file
 * Python 2.7+ or 3+
 * Python Popen module
 ## Build instructions
-make -C <running dir>/packages/netsim-tool clean all
+make -C <running dir>/packages/netsim-tool/src clean all
 
 ## Usage examples
 ### config
