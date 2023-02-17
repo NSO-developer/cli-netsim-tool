@@ -20,7 +20,7 @@ import os
 from collections import namedtuple
 from ncs.application import Service
 from ncs.dp import Action
-from shell_commands import NetsimShell
+from netsim_tool.shell_commands import NetsimShell
 
 
 class NetsimTool(Action):
