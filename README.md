@@ -24,7 +24,7 @@ Apart from this README, please refer to the python code and associated YANG file
 * Python Popen module
 
 ## Build instructions
-make -C <running dir>/packages/netsim-tool/src clean all
+make -C <running dir>/packages/netsim-tool/src all
 
 ## Usage examples
 ### config
